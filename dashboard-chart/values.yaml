@@ -1,0 +1,22 @@
+replicaCount: 1
+
+image:
+  repository: gcr.io/devopsduniya/dashboard-service
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: LoadBalancer
+  port: 80
+
+livenessProbe:
+  path: /healthz
+  port: 3000
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  path: /readiness
+  port: 3000
+  initialDelaySeconds: 30
+  periodSeconds: 10
