@@ -15,4 +15,4 @@ COPY . .
 EXPOSE 3000
 
 # Start the service
-CMD ["node", "auth.js"]
+CMD ["node", "dashboard.js"]
