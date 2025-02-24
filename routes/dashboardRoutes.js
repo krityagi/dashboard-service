@@ -5,9 +5,11 @@ function isAuthenticated(req, res, next) {
     if (req.session && req.session.user) {
         return next();
     } else {
-        return res.status(401).redirect('/login');
+        return res.redirect('/login');
     }
 }
+app.use('/dashboard', isAuthenticated);
+
 
 router.get('/dashboard', isAuthenticated, (req, res) => {
     res.render('dashboard', { user: req.session.user });
