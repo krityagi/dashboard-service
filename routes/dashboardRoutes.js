@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 function isAuthenticated(req, res, next) {
+    console.log('Session in dashboard middleware:', req.session); // Add logging
     if (req.session && req.session.user) {
         return next();
     } else {
@@ -13,6 +14,7 @@ router.get('/dashboard', isAuthenticated, (req, res) => {
     res.render('dashboard', { user: req.session.user });
 });
 
+// Other routes
 router.get('/git-tutorial', isAuthenticated, (req, res) => {
     res.render('git-tutorial', { user: req.session.user });
 });
@@ -30,3 +32,4 @@ router.get('/python-tutorial', isAuthenticated, (req, res) => {
 });
 
 module.exports.router = router;
+
