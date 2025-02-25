@@ -38,4 +38,4 @@ router.get('/python-tutorial', isAuthenticated, (req, res) => {
     res.render('python-tutorial', { user: req.session.user });
 });
 
-module.exports = router;
+module.exports.router = router;
