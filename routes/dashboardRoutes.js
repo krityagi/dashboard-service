@@ -17,6 +17,13 @@ router.get('/dashboard', isAuthenticated, (req, res) => {
     res.render('dashboard', { user: req.session.user });
 });
 
+router.get('/login', (req, res) => {
+    res.render('login', {
+        title: 'Login',
+        message: 'Please log in to continue'
+    });
+});
+
 // Add logging for other routes as well
 router.get('/git-tutorial', isAuthenticated, (req, res) => {
     console.log('Rendering git tutorial for user:', req.session.user.email);
