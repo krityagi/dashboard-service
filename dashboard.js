@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const RedisStore = require('connect-redis')(session);
+const redisClient = require('redis').createClient();
 
 dotenv.config();
 
@@ -18,6 +20,13 @@ mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected for Dashboard Service'))
     .catch(err => console.log('MongoDB connection error:', err));
 
+redisClient.on('connect', () => {
+    console.log('Redis client connected');
+});
+redisClient.on('error', (err) => {
+    console.log('Redis client error:', err);
+});
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -26,6 +35,7 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
+    store: new RedisStore({ client: redisClient }),
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
