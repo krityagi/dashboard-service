@@ -17,7 +17,9 @@
     "ejs": "^3.1.6",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
-    "mongoose": "^5.11.15"
+    "mongoose": "^5.11.15",
+    "redis": "^3.1.2",
+    "connect-redis": "^4.0.4"
   },
   "devDependencies": {
     "mocha": "^11.1.0"
