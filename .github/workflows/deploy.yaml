@@ -35,3 +35,4 @@ jobs:
         IMAGE_TAG: ${{ github.event.client_payload.tag }}
       run: |
         helm upgrade --install dashboard-service ./dashboard-chart --namespace devopsduniya-dev --set image.tag=${{ env.IMAGE_TAG }}
+  
