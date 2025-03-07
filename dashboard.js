@@ -69,7 +69,7 @@ app.get('/readiness', (req, res) => {
 
 // Add a route to handle GET requests to the root URL
 app.get('/', (req, res) => {
-    res.send('Welcome to the Dashboard Home Page!');
+    res.redirect('/dashboard');
 });
 
 // Routes
