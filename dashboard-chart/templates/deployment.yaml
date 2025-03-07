@@ -52,6 +52,10 @@ spec:
               key: REDIRECT_URI
         - name: MONGO_URI
           value: "mongodb://${DB_USERNAME}:${DB_PASSWORD}@mongo:27017/authService?authSource=admin"
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: REDIS_PORT
+          value: "6379"
         ports:
         - containerPort: 3000
         livenessProbe:
