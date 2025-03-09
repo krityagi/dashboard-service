@@ -47,8 +47,7 @@ app.use(session({
     saveUninitialized: false,
     cookie: { secure: false,
         sameSite: 'Lax',
-        domain: 'devopsduniya.in',
-        path: '/'
+        domain: 'devopsduniya.in'
     },
     logErrors: true
 }));
@@ -57,6 +56,15 @@ app.use(session({
 app.use((req, res, next) => {
     //console.log('Session in middleware:', req.session);
     res.locals.user = req.session.user; // Make user available in templates
+    next();
+});
+
+app.use((req, res, next) => {
+    if (!req.session) {
+        console.log('No session found for this request!');
+    } else {
+        console.log('Session loaded:', req.session);
+    }
     next();
 });
 
