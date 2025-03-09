@@ -2,14 +2,15 @@ const express = require('express');
 const router = express.Router();
 
 function isAuthenticated(req, res, next) {
-    console.log('Request Headers:', req.headers);
+    //console.log('Request Headers:', req.headers);
     console.log('Session in dashboard middleware:', req.session);
     console.log('Session in dashboard middleware:', req.session.user.email);
-    if (req.session && req.session.user.email) {
+    if (req.session && req.session.user && req.session.user.email) {
         console.log('User authenticated:', req.session.user.email);
         return next();
     } else {
         console.log('User not authenticated, redirecting to login');
+        console.error('Session details (for debugging):', req.session);
         return res.status(401).redirect('/login');
     }
 }
