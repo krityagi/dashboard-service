@@ -4,6 +4,7 @@ const router = express.Router();
 function isAuthenticated(req, res, next) {
     console.log('Request Headers:', req.headers);
     console.log('Session in dashboard middleware:', req.session);
+    console.log('Session in dashboard middleware:', req.session.user.email);
     if (req.session && req.session.user.email) {
         console.log('User authenticated:', req.session.user.email);
         return next();
