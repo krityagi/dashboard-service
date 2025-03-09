@@ -29,7 +29,6 @@ router.get('/dashboard', isAuthenticated, (req, res) => {
     }
 });
 
-
 router.get('/login', (req, res) => {
     res.render('login', {
         title: 'Login',
