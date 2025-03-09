@@ -40,12 +40,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+console.log('SESSION_SECRET:', process.env.SESSION_SECRET);
 app.use(session({
     store: new RedisStore({ client: redisClient }),
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false,
+        httpOnly: true,
         sameSite: 'Lax',
         domain: 'devopsduniya.in'
     },
@@ -54,8 +56,8 @@ app.use(session({
 
 // Middleware to make user data available in all templates
 app.use((req, res, next) => {
-    //console.log('Session in middleware:', req.session);
-    res.locals.user = req.session.user; // Make user available in templates
+    console.log('Session in middleware:', req.session);
+    //res.locals.user = req.session.user; // Make user available in templates
     next();
 });
 
