@@ -15,9 +15,20 @@ function isAuthenticated(req, res, next) {
 }
 
 router.get('/dashboard', isAuthenticated, (req, res) => {
-    console.log('Rendering dashboard for user:', req.session.user.email);
-    res.render('dashboard', { user: req.session.user });
+    try {
+        if (req.session && req.session.user && req.session.user.email) {
+            console.log('Rendering dashboard for user:', req.session.user.email);
+            return res.render('dashboard', { user: req.session.user });
+        } else {
+            console.error('Session or user email missing in /dashboard route');
+            return res.status(401).redirect('/login');
+        }
+    } catch (error) {
+        console.error('Error rendering dashboard:', error);
+        return res.status(500).send('Internal Server Error');
+    }
 });
+
 
 router.get('/login', (req, res) => {
     res.render('login', {
