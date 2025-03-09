@@ -31,6 +31,7 @@ redisClient.on('connect', () => {
 
 redisClient.on('error', (err) => {
     console.log('Redis client error:');
+    process.exit(1);
 });
 
 app.set('view engine', 'ejs');
@@ -68,6 +69,7 @@ app.use((req, res, next) => {
     }
     console.log('Session in dashboard-service:', req.session);
     if (req.session && req.session.user) {
+        res.locals.user = req.session.user;
         console.log('Session user exists:', req.session.user);
     } else {
         console.error('User not found in session.');
