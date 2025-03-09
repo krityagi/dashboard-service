@@ -55,7 +55,7 @@ app.use(session({
 
 // Middleware to make user data available in all templates
 app.use((req, res, next) => {
-    console.log('Session in middleware:', req.session);
+    //console.log('Session in middleware:', req.session);
     res.locals.user = req.session.user; // Make user available in templates
     next();
 });
