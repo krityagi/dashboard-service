@@ -34,16 +34,23 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Update the session configuration
 app.use(session({
-    store: new RedisStore({ client: redisClient }),
+    store: new RedisStore({ 
+        client: redisClient,
+        prefix: 'sess:',
+        ttl: 86400 // 24 hours
+    }),
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    name: 'connect.sid',
     cookie: { 
         secure: false,
         httpOnly: true,
         sameSite: 'Lax',
-        domain: 'devopsduniya.in'
+        domain: 'devopsduniya.in',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
 }));
 
@@ -74,9 +81,22 @@ app.get('/', (req, res) => {
     res.redirect('/dashboard');
 });
 
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+});
+
 // Routes
 app.use('/', dashboardRoutes);
 
+app.use((req, res) => {
+    console.log('404 - Route not found:', req.url);
+    res.status(404).json({ error: 'Route not found' });
+});
+
 app.listen(port, () => {
     console.log(`Dashboard Service is running on http://localhost:${port}/dashboard`);
+    console.log('Environment:', process.env.NODE_ENV);
+    console.log('Redis host:', process.env.REDIS_HOST);
+    console.log('Session secret exists:', !!process.env.SESSION_SECRET);
 });
