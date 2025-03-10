@@ -51,10 +51,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
     store: new RedisStore({ 
         client: redisClient,
-        prefix: 'sess:', // Important: Use the same prefix
+        prefix: 'sess:',
         ttl: 86400 // 24 hours
     }),
-    secret: process.env.SESSION_SECRET, // Must be the same as auth service
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: { 
@@ -62,7 +62,8 @@ app.use(session({
         httpOnly: true,
         sameSite: 'Lax',
         domain: 'devopsduniya.in',
-        path: '/'
+        path: '/',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
     },
     name: 'connect.sid'
 }));
