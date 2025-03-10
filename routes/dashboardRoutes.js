@@ -15,33 +15,45 @@ function isAuthenticated(req, res, next) {
     }
 }
 
-router.get('/dashboard', isAuthenticated, (req, res) => {
+router.get('/dashboard', isAuthenticated, async (req, res) => {
     try {
         console.log('Attempting to render dashboard for user:', req.session.user.email);
         
-        // Set response headers to prevent caching
+        // Set response headers
         res.set({
+            'Content-Type': 'text/html; charset=utf-8',
             'Cache-Control': 'no-store, no-cache, must-revalidate, private',
             'Expires': '-1',
-            'Pragma': 'no-cache'
+            'Pragma': 'no-cache',
+            'X-Content-Type-Options': 'nosniff'
         });
 
-        // Render the dashboard template
-        res.render('dashboard', { 
-            user: req.session.user,
-            sessionID: req.sessionID,
-            layout: false // Disable layout if you're not using one
-        }, (err, html) => {
-            if (err) {
-                console.error('Template rendering error:', err);
-                return res.status(500).send('Error rendering dashboard');
-            }
-            console.log('Dashboard template rendered successfully');
-            res.send(html);
+        // Promise-based render
+        const html = await new Promise((resolve, reject) => {
+            res.render('dashboard', { 
+                user: req.session.user,
+                sessionID: req.sessionID,
+                layout: false
+            }, (err, renderedHtml) => {
+                if (err) {
+                    console.error('Template rendering error:', err);
+                    reject(err);
+                    return;
+                }
+                console.log('Dashboard template rendered successfully');
+                resolve(renderedHtml);
+            });
         });
+
+        console.log('Sending response with content length:', html.length);
+        return res.status(200).send(html);
+
     } catch (error) {
         console.error('Error in dashboard route:', error);
-        res.status(500).send('Internal Server Error');
+        return res.status(500).json({
+            error: 'Internal Server Error',
+            message: error.message
+        });
     }
 });
 
