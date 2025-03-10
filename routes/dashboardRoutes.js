@@ -10,55 +10,45 @@ function isAuthenticated(req, res, next) {
         console.log('User authenticated:', req.session.user.email);
         return next();
     } else {
-        console.log('User not authenticated');
-        return res.redirect('/login');
+        console.log('User not authenticated, sending 401');
+        // Instead of redirecting, send a 401 status
+        return res.status(401).json({ 
+            error: 'Not authenticated',
+            redirectUrl: '/login'
+        });
     }
 }
 
-router.get('/dashboard', isAuthenticated, async (req, res) => {
+router.get('/dashboard', isAuthenticated, (req, res) => {
     try {
         console.log('Attempting to render dashboard for user:', req.session.user.email);
         
-        // Set response headers
+        // Simplified headers
         res.set({
             'Content-Type': 'text/html; charset=utf-8',
-            'Cache-Control': 'no-store, no-cache, must-revalidate, private',
-            'Expires': '-1',
-            'Pragma': 'no-cache',
-            'X-Content-Type-Options': 'nosniff',
-            'Connection': 'keep-alive'
+            'Cache-Control': 'private, no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache'
         });
 
-        // Direct render approach
-        res.render('dashboard', { 
+        // Simple render without callback
+        return res.render('dashboard', { 
             user: req.session.user,
-            sessionID: req.sessionID,
             layout: false
-        }, (err, html) => {
-            if (err) {
-                console.error('Template rendering error:', err);
-                return res.status(500).send('Error rendering dashboard');
-            }
-            
-            console.log('Dashboard template rendered successfully');
-            console.log('Response headers:', res.getHeaders());
-            
-            // Send the response
-            res.status(200).end(html);
         });
 
     } catch (error) {
         console.error('Error in dashboard route:', error);
-        return res.status(500).json({
-            error: 'Internal Server Error',
-            message: error.message
-        });
+        return res.status(500).send('Internal Server Error');
     }
 });
 
-// Add a route for handling login redirects
 router.get('/login', (req, res) => {
-    res.render('login', { 
+    // If user is already authenticated, redirect to dashboard
+    if (req.session && req.session.user) {
+        return res.redirect('/dashboard');
+    }
+    
+    return res.render('login', { 
         message: 'Please log in to continue',
         layout: false
     });
