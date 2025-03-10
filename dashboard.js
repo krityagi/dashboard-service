@@ -8,7 +8,7 @@ const redis = require('redis');
 
 dotenv.config();
 
-const dashboardRoutes = require('./routes/dashboardRoutes').router;
+const dashboardRoutes = require('./routes/dashboardRoutes');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -75,7 +75,7 @@ app.get('/', (req, res) => {
 });
 
 // Routes
-app.use(dashboardRoutes);
+app.use('/', dashboardRoutes);
 
 app.listen(port, () => {
     console.log(`Dashboard Service is running on http://localhost:${port}/dashboard`);

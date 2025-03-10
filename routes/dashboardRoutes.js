@@ -12,7 +12,6 @@ function isAuthenticated(req, res, next) {
     } else {
         console.log('User not authenticated, redirecting to login');
         console.error('Session details (for debugging):', req.session);
-        // Instead of redirecting, return JSON for debugging
         return res.status(401).json({
             error: 'Not authenticated',
             sessionExists: !!req.session,
@@ -52,4 +51,5 @@ router.get('/dashboard', isAuthenticated, (req, res) => {
     }
 });
 
-// ...existing code...
+// Export the router directly
+module.exports = router;
