@@ -9,65 +9,48 @@ router.use((req, res, next) => {
 });
 
 function isAuthenticated(req, res, next) {
-    // Detailed session logging
-    console.log('Authentication Check:', {
-        hasCookie: !!req.headers.cookie,
-        cookie: req.headers.cookie,
+    console.log('Auth Check:', {
         sessionID: req.sessionID,
+        hasCookie: !!req.headers.cookie,
+        cookieContent: req.headers.cookie,
         hasSession: !!req.session,
-        hasUser: !!(req.session && req.session.user)
+        sessionUser: req.session ? req.session.user : null
     });
-    
-    if (req.session && req.session.user) {
-        console.log('User authenticated:', req.session.user.email);
-        // Set local variables for use in templates
-        res.locals.user = req.session.user;
-        return next();
+
+    if (!req.session) {
+        console.error('No session found');
+        return res.redirect('/login');
     }
-    
-    console.log('Authentication failed');
-    // Instead of redirecting, send status code
-    return res.status(401).json({ 
-        error: 'Not authenticated',
-        redirectUrl: '/login'
-    });
+
+    if (!req.session.user) {
+        console.error('No user in session');
+        return res.redirect('/login');
+    }
+
+    console.log('User authenticated:', req.session.user);
+    res.locals.user = req.session.user;
+    next();
 }
 
 router.get('/dashboard', isAuthenticated, (req, res) => {
     try {
-        console.log('Dashboard route accessed:', {
+        console.log('Dashboard access:', {
             sessionID: req.sessionID,
             user: req.session.user
         });
 
-        // Set security headers
-        res.set({
-            'Content-Type': 'text/html; charset=utf-8',
-            'Cache-Control': 'private, no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'X-Content-Type-Options': 'nosniff',
-            'X-Frame-Options': 'DENY',
-            'X-XSS-Protection': '1; mode=block'
-        });
+        if (!req.session.user) {
+            console.error('No user in session at dashboard');
+            return res.redirect('/login');
+        }
 
-        // Render dashboard with error handling
-        res.render('dashboard', { 
+        return res.render('dashboard', { 
             user: req.session.user,
             layout: false
-        }, (err, html) => {
-            if (err) {
-                console.error('Template render error:', err);
-                return res.status(500).send('Error rendering dashboard');
-            }
-            res.send(html);
         });
-
     } catch (error) {
-        console.error('Dashboard route error:', error);
-        return res.status(500).json({
-            error: 'Internal Server Error',
-            details: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
+        console.error('Dashboard error:', error);
+        return res.status(500).send('Internal Server Error');
     }
 });
 

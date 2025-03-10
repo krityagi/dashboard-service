@@ -18,14 +18,10 @@ const redisClient = redis.createClient({
     port: process.env.REDIS_PORT || 6379,
     retry_strategy: function(options) {
         if (options.error && options.error.code === 'ECONNREFUSED') {
-            console.error('Redis connection refused');
-            return new Error('Redis server refused connection');
+            return new Error('The server refused the connection');
         }
         if (options.total_retry_time > 1000 * 60 * 60) {
             return new Error('Retry time exhausted');
-        }
-        if (options.attempt > 10) {
-            return undefined;
         }
         return Math.min(options.attempt * 100, 3000);
     }
@@ -52,20 +48,19 @@ app.use(session({
     store: new RedisStore({ 
         client: redisClient,
         prefix: 'sess:',
-        ttl: 86400 // 24 hours
+        ttl: 86400
     }),
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    name: 'connect.sid',
     cookie: { 
         secure: false,
         httpOnly: true,
         sameSite: 'Lax',
         domain: 'devopsduniya.in',
-        path: '/',
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    },
-    name: 'connect.sid'
+        path: '/'
+    }
 }));
 
 // Middleware to make user data available in all templates
