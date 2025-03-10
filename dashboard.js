@@ -49,8 +49,12 @@ app.use(session({
 
 // Middleware to make user data available in all templates
 app.use((req, res, next) => {
+    console.log('Session middleware:', req.session);
     if (req.session && req.session.user) {
         res.locals.user = req.session.user;
+        console.log('Session user exists:', req.session.user);
+    } else {
+        console.error('User not found in session.');
     }
     next();
 });
