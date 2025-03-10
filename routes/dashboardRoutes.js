@@ -25,28 +25,27 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
             'Cache-Control': 'no-store, no-cache, must-revalidate, private',
             'Expires': '-1',
             'Pragma': 'no-cache',
-            'X-Content-Type-Options': 'nosniff'
+            'X-Content-Type-Options': 'nosniff',
+            'Connection': 'keep-alive'
         });
 
-        // Promise-based render
-        const html = await new Promise((resolve, reject) => {
-            res.render('dashboard', { 
-                user: req.session.user,
-                sessionID: req.sessionID,
-                layout: false
-            }, (err, renderedHtml) => {
-                if (err) {
-                    console.error('Template rendering error:', err);
-                    reject(err);
-                    return;
-                }
-                console.log('Dashboard template rendered successfully');
-                resolve(renderedHtml);
-            });
+        // Direct render approach
+        res.render('dashboard', { 
+            user: req.session.user,
+            sessionID: req.sessionID,
+            layout: false
+        }, (err, html) => {
+            if (err) {
+                console.error('Template rendering error:', err);
+                return res.status(500).send('Error rendering dashboard');
+            }
+            
+            console.log('Dashboard template rendered successfully');
+            console.log('Response headers:', res.getHeaders());
+            
+            // Send the response
+            res.status(200).end(html);
         });
-
-        console.log('Sending response with content length:', html.length);
-        return res.status(200).send(html);
 
     } catch (error) {
         console.error('Error in dashboard route:', error);
